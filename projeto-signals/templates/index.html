@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinais de Trading</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Sinais de Trading</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Ativo</th>
+                <th>Sinal</th>
+                <th>Data e Hora</th>
+            </tr>
+        </thead>
+        <tbody id="sinais-tbody">
+            <!-- Os sinais serão inseridos aqui pelo JavaScript -->
+        </tbody>
+    </table>
+    <script>
+        function loadSinais() {
+            fetch('/sinais')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('sinais-tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(sinal => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${sinal.ativo}</td>
+                            <td>${sinal.Sinal}</td>
+                            <td>${sinal.datetime}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar os sinais:', error));
+        }
+
+        loadSinais();
+        setInterval(loadSinais, 60000); // Atualiza a cada minuto
+    </script>
+</body>
+</html>

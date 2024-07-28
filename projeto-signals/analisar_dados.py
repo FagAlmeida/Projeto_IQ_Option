@@ -1,17 +1,31 @@
 import pandas as pd
+import talib
+import numpy as np
 
-# Carregar os dados
-dados = pd.read_csv('dados_mercado.csv')
+def carregar_dados(caminho_arquivo):
+    try:
+        dados = pd.read_csv(caminho_arquivo)
+        dados = dados.dropna(subset=['close'])
+        return dados
+    except Exception as e:
+        print(f"Erro ao carregar os dados: {e}")
+        return None
 
-# Calcular SMA e RSI
-dados['SMA'] = dados['close'].rolling(window=10).mean()
-dados['RSI'] = 100 - (100 / (1 + dados['close'].diff().rolling(window=14).apply(lambda x: (x[x > 0].sum() / abs(x[x < 0]).sum()) if abs(x[x < 0]).sum() != 0 else 0)))
+def calcular_indicadores(dados):
+    try:
+        dados['SMA'] = talib.SMA(dados['close'], timeperiod=10)
+        dados['RSI'] = talib.RSI(dados['close'], timeperiod=14)
+        return dados
+    except Exception as e:
+        print(f"Erro ao calcular indicadores: {e}")
+        return None
 
-# Função para determinar sinais de compra e venda
 def sinais_trading(dados):
     sinais = []
     for i in range(len(dados)):
-        if dados['RSI'][i] < 30 and dados['close'][i] < dados['SMA'][i]:
+        if pd.isna(dados['RSI'][i]) or pd.isna(dados['SMA'][i]):
+            sinais.append('Neutro')
+        elif dados['RSI'][i] < 30 and dados['close'][i] < dados['SMA'][i]:
             sinais.append('Compra')
         elif dados['RSI'][i] > 70 and dados['close'][i] > dados['SMA'][i]:
             sinais.append('Venda')
@@ -19,8 +33,18 @@ def sinais_trading(dados):
             sinais.append('Neutro')
     return sinais
 
-# Adicionar sinais de trading ao dataframe
-dados['Sinal'] = sinais_trading(dados)
+def main():
+    dados = carregar_dados('dados_mercado.csv')
+    if dados is not None:
+        dados = calcular_indicadores(dados)
+        if dados is not None:
+            dados['Sinal'] = sinais_trading(dados)
+            dados.to_csv('dados_mercado_com_sinais.csv', index=False)
+            print("Análise concluída e arquivo atualizado com sinais.")
+        else:
+            print("Erro ao calcular indicadores.")
+    else:
+        print("Erro ao carregar os dados.")
 
-# Salvar o arquivo atualizado
-dados.to_csv('dados_mercado_com_sinais.csv', index=False)
+if __name__ == "__main__":
+    main()
