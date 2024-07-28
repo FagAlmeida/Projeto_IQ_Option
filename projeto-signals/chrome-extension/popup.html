@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Signals Extension</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>IQ Option Trading Bot</h1>
+        <label for="currency">Escolha a moeda:</label>
+        <select id="currency">
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+        </select>
+        <button id="startBot">Start Bot</button>
+        <div id="signals">
+            <h2>Previsões:</h2>
+            <ul id="signalsList"></ul>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
